@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+    <head>        
+        <script src="https://code.jquery.com/jquery-3.3.1.js"></script>
+    </head>
+    <body>
+        <input type="text" id="serch-keyword"/>
+        <input type="button" id="search" value="検索" />
+        <div id="disp-video"></div>
+        <script>
+            $(function(){     
+                //検索ボタン押したら発火       
+                $('#search').click(function(){
+                    //１．検索用URL
+                    const BASE_URL = "https://www.googleapis.com/youtube/v3/search?";
+                    //２．取得したAPIキー（ここは Google Apis から個人で取得）
+                    const API_KEY = 'key=************';
+                    //３．必須パラメーター
+                    const PART = '&part=snippet';
+                    //４．動画検索であることを明記（これ書かないとチャンネルとか検索しにいってしまう）
+                    const TYPE = '&type=video';
+                    //５．検索ワード
+                    const KEYWORD = '&q=' + $('#serch-keyword').val();
+
+                    let url = BASE_URL;
+                    url += API_KEY;
+                    url += PART;
+                    url += TYPE;
+                    url += KEYWORD;
+                    
+                    //こうすることで↑の変数urlの中で
+                    //https://www.googleapis.com/youtube/v3/search?key=******&part=snippet&type=video&q=検索ワード
+                    //みたいなURLが出来上がる。これをたたくとYoutubeの検索結果がjson形式で返ってくる
+
+                    $.ajax({
+                        url:url,
+                        dataType:'json',
+                    })
+                    //実行時
+                    .done(function(data){
+                        //今のところ処理なし
+                    })
+                    //失敗時
+                    .fail(function(){
+                        //本当は何かしらの失敗メッセージ出しておくべき
+                    })
+                    //成功時
+                    .always(function(data){
+                        //↑の(data)ってやつが返ってきたjson。検索結果全件分詰まってる
+                        //大量に返ってくるけどとりあえず最初の一件目（items[0]で指定）だけ取得
+                        let videoId = data.items[0].id.videoId;
+                        //iflameタグに組み込んでHTML側に表示
+                        $('#disp-video').html('<iframe src="https://youtube.com/embed/'+ videoId +'" frameborder="0"></iframe>');
+                    });
+                });
+            })
+        </script>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+    </body>
+        
+</html>
